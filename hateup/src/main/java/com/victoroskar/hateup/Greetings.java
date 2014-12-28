@@ -6,7 +6,10 @@ import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.users.User;
 
 import java.util.ArrayList;
-
+import java.io.*;
+import java.sql.*;
+import javax.servlet.http.*;
+import com.google.appengine.api.utils.SystemProperty;
 import javax.inject.Named;
 
 /**
@@ -60,6 +63,32 @@ public class Greetings {
   public HelloGreeting postRealTalk(@Named("realTalk") String realTalk) throws NotFoundException {
 	  HelloGreeting response = new HelloGreeting();
 	  response.message = "REALTALKNIGGA";
+	  System.out.println("asdasdsad");
+	  try {
+		  System.out.println("ddddd");
+	  String url = null;
+//	  if (SystemProperty.environment.value() ==
+//	  SystemProperty.Environment.Value.Production) {
+	  // Connecting from App Engine.
+	  // Load the class that provides the "jdbc:google:mysql://"
+	  // prefix.
+	  Class.forName("com.mysql.jdbc.GoogleDriver");
+	  url =
+	  "jdbc:google:mysql://natural-client-801:hateup-primary?user=root";
+//	  } else {
+//	    // You may also assign an IP Address from the access control
+//	  // page and use it to connect from an external network.
+//	  }
+	  System.out.println("fffff");
+	  Connection conn = DriverManager.getConnection(url);
+	  ResultSet rs = conn.createStatement().executeQuery(
+	  "SELECT 1 + 1");
+	  System.out.println("ddasdasdasdasdsddd");
+	  response.message = rs.toString();
+	  } catch(Exception e) {
+		  System.out.println(e.toString()+"  "+e);
+		  
+	  }
 	  return response;
   }
 }
