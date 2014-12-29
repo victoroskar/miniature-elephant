@@ -93,7 +93,7 @@ google.devrel.samples.hello.print = function(greeting) {
  * @param {string} id ID of the greeting.
  */
 google.devrel.samples.hello.getGreeting = function(id) {
-  gapi.client.hateup.greetings.getGreeting({'id': id}).execute(
+  gapi.client.hateup.sandbox.getGreeting({'id': id}).execute(
       function(resp) {
         if (!resp.code) {
           google.devrel.samples.hello.print(resp);
@@ -104,7 +104,7 @@ google.devrel.samples.hello.getGreeting = function(id) {
 };
 
 google.devrel.samples.hello.realTalk = function(speakonit) {
-	gapi.client.hateup.greetings.postRealTalk({'realTalk': speakonit}).execute(
+	gapi.client.hateup.sandbox.postRealTalk({'realTalk': speakonit}).execute(
 		function(resp) {
 			if (!resp.code) {
 	          google.devrel.samples.hello.print(resp);
@@ -115,10 +115,10 @@ google.devrel.samples.hello.realTalk = function(speakonit) {
 };
 
 /**
- * Lists greetings via the API.
+ * Lists sandbox via the API.
  */
 google.devrel.samples.hello.listGreeting = function() {
-  gapi.client.hateup.greetings.listGreeting().execute(
+  gapi.client.hateup.sandbox.listGreeting().execute(
       function(resp) {
         if (!resp.code) {
           resp.items = resp.items || [];
@@ -136,7 +136,7 @@ google.devrel.samples.hello.listGreeting = function() {
  */
 google.devrel.samples.hello.multiplyGreeting = function(
     greeting, times) {
-  gapi.client.hateup.greetings.multiply({
+  gapi.client.hateup.sandbox.multiply({
       'message': greeting,
       'times': times
     }).execute(function(resp) {
@@ -150,7 +150,7 @@ google.devrel.samples.hello.multiplyGreeting = function(
  * Greets the current user via the API.
  */
 google.devrel.samples.hello.authedGreeting = function(id) {
-  gapi.client.hateup.greetings.authed().execute(
+  gapi.client.hateup.sandbox.authed().execute(
       function(resp) {
         google.devrel.samples.hello.print(resp);
       });
