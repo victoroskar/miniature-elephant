@@ -1,16 +1,21 @@
 package com.victoroskar.hateup;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.users.User;
-
-import java.util.ArrayList;
-import java.io.*;
-import java.sql.*;
-import javax.servlet.http.*;
 import com.google.appengine.api.utils.SystemProperty;
-import javax.inject.Named;
+import com.victoroskar.hateup.entity.Message;
 
 /**
  * Defines v1 of a helloworld API, which provides simple "greeting" methods.
@@ -23,7 +28,7 @@ import javax.inject.Named;
     audiences = {Constants.ANDROID_AUDIENCE}
 )
 public class Sandbox {
-
+ 
   public static ArrayList<HelloGreeting> greetings = new ArrayList<HelloGreeting>();
 
   static {
@@ -64,29 +69,54 @@ public class Sandbox {
 	  HelloGreeting response = new HelloGreeting();
 	  response.message = "REALTALKNIGGA";
 
+	  Map<String, String> properties = new HashMap();
+	  
 	  try {
 		  String url = null;
 		  if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
 			// Connecting from App Engine.
 			// Load the class that provides the "jdbc:google:mysql://"
 			// prefix.
-			Class.forName("com.mysql.jdbc.GoogleDriver");
-			url = "jdbc:google:mysql://natural-client-801:hateup-primary?user=root";
+			  properties.put("javax.persistence.jdbc.driver",
+			          "com.mysql.jdbc.GoogleDriver");
+			      properties.put("javax.persistence.jdbc.url",
+			          System.getProperty("cloudsql.url.prod"));
 		  } else {
-			// You may also assign an IP Address from the access control
-			// page and use it to connect from an external network. //127.0.0.1
-			// Local MySQL instance to use during development.
-			Class.forName("com.mysql.jdbc.Driver");
-			url = "jdbc:mysql://localhost:3306/test?user=root";
+			  properties.put("javax.persistence.jdbc.driver",
+			          "com.mysql.jdbc.Driver");
+		      properties.put("javax.persistence.jdbc.url",
+			          System.getProperty("cloudsql.url.dev"));
+		      properties.put("javax.persistence.jdbc.user",
+			          System.getProperty("cloudsql.url.dev.user"));
 		  }
-			  
-		  Connection conn = DriverManager.getConnection(url);
-		  ResultSet rs = conn.createStatement().executeQuery("SELECT 1 + 1");
-		  response.message = rs.toString();
+		
+//		  Connection conn = DriverManager.getConnection(url);
+//		  ResultSet rs = conn.createStatement().executeQuery("SELECT 1 + 1");
+		  System.out.println("Step 1: "+properties.get("javax.persistence.jdbc.driver")+ "  "+properties.get("javax.persistence.jdbc.url"));
+		  EntityManagerFactory emf = Persistence.createEntityManagerFactory("my-app", properties);
+		  System.out.println("Step 2");
+
+		    // Insert a few rows.
+		    EntityManager em = emf.createEntityManager();
+		    em.getTransaction().begin();
+			  System.out.println("Step 3");
+	
+		    em.persist(new Message("user"));
+		    em.getTransaction().commit();
+			  System.out.println("Step 4");
+	
+		    em.close();
+		  
+		  response.message = "test";
 	  } catch(Exception e) {
-		  System.out.println(e.toString()+"  "+e);
+		  System.out.println("Exception: \n");
+
+		  System.out.println(e.toString()+"  \n ");
+		  for(StackTraceElement x : e.getStackTrace()) {
+			  System.out.println("Stack Element: "+x.toString());
+		  }
 	  }
-	  
+	  response.message += "TESTERTS";
 	  return response;
   }
 }

@@ -6,5 +6,9 @@
 	<use-google-connector-j>true</use-google-connector-j>
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
+        <property name="cloudsql.url.dev" value="jdbc:mysql://localhost:3306/hateup"/>
+        <property name="cloudsql.url.dev.user" value="root"/>
+		<property name="cloudsql.url.prod" value="jdbc:google:mysql://natural-client-801:hateup-primary"/>
+		<property name="cloudsql.url.prod.user" value="root"/>
     </system-properties>
 </appengine-web-app>
