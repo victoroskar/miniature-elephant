@@ -104,7 +104,7 @@ google.devrel.samples.hello.getGreeting = function(id) {
 };
 
 google.devrel.samples.hello.realTalk = function(speakonit) {
-	gapi.client.hateup.sandbox.postRealTalk({'realTalk': speakonit}).execute(
+	gapi.client.hateup.getRealtalk({'realTalk': speakonit}).execute(
 		function(resp) {
 			if (!resp.code) {
 	          google.devrel.samples.hello.print(resp);
