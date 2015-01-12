@@ -3,23 +3,28 @@ package com.victoroskar.hateup.entity;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
 public class Message {
 	@Id
-	Long idmessages;
+	public Long idmessages;
 	public String message;
-	String owner;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "owner")
+	public Account owner;
 	@Temporal(TemporalType.DATE)
-	Date create_date;
+	public Date create_date;
 
 	public Message() {
 	}
 
-	public Message(String newMessage, String newOwner) {
+	public Message(String newMessage, Account newOwner) {
 		this.create_date = new Date();
 		this.message = newMessage;
 		this.owner = newOwner;
@@ -40,15 +45,15 @@ public class Message {
 	public void setIdmessages(Long id) {
 		this.idmessages = id;
 	}
-	
-	public String getOwner() {
-		return owner;
+
+	public Account getOwner() {
+		return this.owner;
 	}
 
-	public void setOwner(String newOwner) {
+	public void setOwner(Account newOwner) {
 		this.owner = newOwner;
 	}
-	
+
 	public Date getCreate_Date() {
 		return create_date;
 	}

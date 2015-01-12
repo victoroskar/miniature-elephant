@@ -1,15 +1,10 @@
 package com.victoroskar.hateup;
 
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import com.google.api.server.spi.config.Api;
@@ -17,7 +12,7 @@ import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiMethod.HttpMethod;
 import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.users.User;
-import com.google.appengine.api.utils.SystemProperty;
+import com.victoroskar.hateup.entity.Account;
 import com.victoroskar.hateup.entity.DataLayerFactory;
 import com.victoroskar.hateup.entity.Message;
 
@@ -42,18 +37,13 @@ public class Sandbox {
 		}
 
 		List<Message> response = null;
-		Map<String, String> properties = new HashMap();
 
 		try {
 			EntityManager em = DataLayerFactory.CreateEntityManager();
 			Query query = em.createQuery("Select m FROM Message m WHERE m.owner='" + accountName + "'");
 			response = query.getResultList();
-
-			for (Message x : response) {
-				System.out.println(x.message);
-			}
-
 			em.close();
+			
 		} catch (Exception e) {
 			System.out.println("Exception: \n");
 			System.out.println(e.toString() + "  \n ");
@@ -67,20 +57,50 @@ public class Sandbox {
 	}
 
 	@ApiMethod(name = "postRealTalk", path = "postrealtalk", httpMethod = HttpMethod.POST)
-	public void postRealTalk(@Named("realTalk") String realTalk, @Named("username") String username) throws NotFoundException {
+	public void postRealTalk(@Named("realTalk") String realTalk, @Named("account_id") Long accountID) throws NotFoundException {
+		try {
+			EntityManager em = DataLayerFactory.CreateEntityManager();
+			Query query = em.createQuery("Select a FROM Account a WHERE a.account_id='" + accountID + "'");
+			List<Account> response = query.getResultList();
+			
+			em.getTransaction().begin();
+			em.persist(new Message(realTalk, response.get(0)));
+			em.getTransaction().commit();
+			em.close();
+
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+
+	@ApiMethod(name = "createAccount", path = "createaccount", httpMethod = HttpMethod.POST)
+	public void createAccount(@Named("username") String username, @Named("location") String location) throws NotFoundException {
 		try {
 			EntityManager em = DataLayerFactory.CreateEntityManager();
 			em.getTransaction().begin();
-			em.persist(new Message(realTalk, username));
+			em.persist(new Account(username, location));
 			em.getTransaction().commit();
 			em.close();
+			
 		} catch (Exception e) {
-			System.out.println("Exception: \n");
-
-			System.out.println(e.toString() + "  \n ");
-			for (StackTraceElement x : e.getStackTrace()) {
-				System.out.println("Stack Element: " + x.toString());
-			}
+			System.out.println(e);
 		}
+	}
+
+	@ApiMethod(name = "getAccount", path = "getaccount", httpMethod = HttpMethod.GET)
+	public List<Account> getAccount(@Named("username") String username) throws NotFoundException {
+		List<Account> response = null;
+
+		try {
+			EntityManager em = DataLayerFactory.CreateEntityManager();
+			Query query = em.createQuery("Select a FROM Account a WHERE a.username='" + username + "'");
+			response = query.getResultList();
+			em.close();
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
+		return response;
 	}
 }
